@@ -1,16 +1,18 @@
 import os
 
 from dotenv import load_dotenv
-from langchain_mistralai import ChatMistralAI
+from langchain_openai import ChatOpenAI
 
 load_dotenv()
 
 def get_mistral_llm():
-    if not os.getenv("MISTRAL_API_KEY"):
-        raise RuntimeError("MISTRAL_API_KEY is not configured.")
+    if not os.getenv("OPENROUTER_API_KEY"):
+        raise RuntimeError("OPENROUTER_API_KEY is not configured.")
 
-    return ChatMistralAI(
-        model=os.getenv("MISTRAL_MODEL", "mistral-small-2603"),
+    return ChatOpenAI(
+        model=os.getenv("OPENROUTER_MODEL", "openrouter/free"),
+        api_key=os.getenv("OPENROUTER_API_KEY"),
+        base_url="https://openrouter.ai/api/v1",
         temperature=0,
-        max_retries=2,
     )
+

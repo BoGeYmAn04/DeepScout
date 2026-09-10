@@ -4,19 +4,19 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 
 const buttonVariants = cva(
-  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-xl text-sm font-medium transition-all outline-none disabled:pointer-events-none disabled:opacity-45 focus-visible:ring-2 focus-visible:ring-cyan-400/50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
+  "inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-all outline-none disabled:pointer-events-none disabled:opacity-40 focus-visible:ring-1 focus-visible:ring-[#83f3dc]/55 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
   {
     variants: {
       variant: {
-        default: "bg-white text-black shadow-[0_8px_30px_rgba(255,255,255,.12)] hover:bg-zinc-200",
-        accent: "border border-cyan-300/25 bg-cyan-300/10 text-cyan-100 shadow-[inset_0_1px_rgba(255,255,255,.06)] hover:bg-cyan-300/15 hover:border-cyan-300/40",
-        ghost: "text-zinc-400 hover:bg-white/[0.06] hover:text-white",
-        outline: "border border-white/10 bg-white/[0.03] text-zinc-200 hover:border-white/20 hover:bg-white/[0.06]",
+        default: "bg-[#ecece8] text-black hover:bg-white",
+        accent: "border border-[#83f3dc]/25 bg-[#83f3dc]/[0.07] text-[#bffbef] hover:border-[#83f3dc]/45 hover:bg-[#83f3dc]/[0.1]",
+        ghost: "text-zinc-500 hover:bg-white/[0.035] hover:text-zinc-200",
+        outline: "border border-white/[0.10] bg-transparent text-zinc-400 hover:border-white/[0.18] hover:bg-white/[0.025] hover:text-zinc-200",
       },
       size: {
         default: "h-10 px-4 py-2",
-        sm: "h-8 rounded-lg px-3 text-xs",
-        lg: "h-12 rounded-2xl px-6 text-base",
+        sm: "h-8 px-3 text-[11px]",
+        lg: "h-12 px-6 text-base",
         icon: "size-10",
       },
     },
@@ -24,15 +24,9 @@ const buttonVariants = cva(
   },
 );
 
-export interface ButtonProps
-  extends React.ButtonHTMLAttributes<HTMLButtonElement>,
-    VariantProps<typeof buttonVariants> {
-  asChild?: boolean;
-}
-
+export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement>, VariantProps<typeof buttonVariants> { asChild?: boolean; }
 export function Button({ className, variant, size, asChild = false, ...props }: ButtonProps) {
   const Comp = asChild ? Slot : "button";
   return <Comp className={cn(buttonVariants({ variant, size, className }))} {...props} />;
 }
-
 export { buttonVariants };

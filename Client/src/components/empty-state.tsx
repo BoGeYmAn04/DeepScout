@@ -1,26 +1,47 @@
-import { Binary, Network, SearchCheck } from "lucide-react";
+import { ArrowDownRight } from "lucide-react";
 import { QueryComposer } from "@/components/query-composer";
 
 export function EmptyState({ query, setQuery, onSubmit }: { query: string; setQuery: (v: string) => void; onSubmit: () => void }) {
   return (
-    <main className="relative flex min-h-full flex-1 items-center justify-center overflow-hidden px-5 py-16">
-      <div className="pointer-events-none absolute left-1/2 top-[38%] h-[520px] w-[720px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-cyan-400/[0.035] blur-[100px]" />
-      <div className="pointer-events-none absolute left-[62%] top-[42%] h-[400px] w-[500px] rounded-full bg-violet-500/[0.035] blur-[110px]" />
-      <div className="relative z-10 flex w-full flex-col items-center text-center">
-        <div className="mb-5 flex items-center gap-2 rounded-full border border-white/[0.08] bg-white/[0.03] px-3 py-1.5 text-[10px] font-medium uppercase tracking-[0.14em] text-zinc-500">
-          <span className="size-1.5 animate-pulse rounded-full bg-emerald-400" /> Autonomous research system
-        </div>
-        <h1 className="max-w-3xl text-4xl font-semibold leading-[1.02] tracking-[-0.055em] text-white md:text-6xl">
-          Research deeper.<br /><span className="bg-gradient-to-r from-zinc-400 via-zinc-200 to-zinc-500 bg-clip-text text-transparent">Know what matters.</span>
-        </h1>
-        <p className="mb-9 mt-5 max-w-xl text-sm leading-6 text-zinc-600 md:text-[15px]">DeepScout autonomously searches the web, reads primary sources, synthesizes findings, and stress-tests its own conclusions.</p>
-        <QueryComposer query={query} setQuery={setQuery} onSubmit={onSubmit} />
-        <div className="mt-12 grid w-full max-w-2xl grid-cols-3 gap-3 border-t border-white/[0.055] pt-6">
-          {[ [SearchCheck, "Search", "Fresh evidence"], [Network, "Synthesize", "Cross-source context"], [Binary, "Critique", "Quality checked"] ].map(([Icon, label, sub]) => {
-            const IconComp = Icon as typeof SearchCheck;
-            return <div key={label as string} className="text-left sm:text-center"><div className="mb-1 flex items-center gap-1.5 text-[11px] font-medium text-zinc-400 sm:justify-center"><IconComp className="size-3.5 text-cyan-300/60" />{label as string}</div><p className="text-[9px] text-zinc-700">{sub as string}</p></div>;
-          })}
-        </div>
+    <main className="relative z-10 flex min-h-full flex-1 overflow-hidden px-5 py-12 md:px-10 lg:px-16">
+      <div className="mx-auto grid w-full max-w-[1160px] content-center gap-12 lg:grid-cols-[minmax(0,1fr)_280px] lg:gap-20">
+        <section>
+          <div className="mono-label mb-8 flex items-center gap-3 text-[8px] text-zinc-600">
+            <span>DeepScout / autonomous research</span>
+            <span className="h-px w-10 bg-[#83f3dc]/35" />
+            <span>04 modules</span>
+          </div>
+          <h1 className="max-w-[760px] text-[46px] font-medium leading-[.96] tracking-[-0.06em] text-[#ecece8] sm:text-[62px] lg:text-[74px]">
+            Ask a hard question.<br />
+            <span className="text-zinc-600">Get a researched answer.</span>
+          </h1>
+          <p className="mb-8 mt-6 max-w-[590px] text-[13px] leading-6 text-zinc-600">
+            DeepScout searches current sources, opens the strongest evidence, writes a structured briefing, then critiques its own output before returning it to you.
+          </p>
+          <QueryComposer query={query} setQuery={setQuery} onSubmit={onSubmit} />
+        </section>
+
+        <aside className="hidden self-end lg:block">
+          <div className="mb-3 flex items-center justify-between">
+            <span className="mono-label text-[8px] text-zinc-700">Pipeline map</span>
+            <span className="mono-label text-[8px] text-zinc-800">DS-04</span>
+          </div>
+          <div className="border-l border-white/[0.08]">
+            {[
+              ["01", "SEARCH", "Find live evidence"],
+              ["02", "READ", "Inspect strongest source"],
+              ["03", "WRITE", "Synthesize findings"],
+              ["04", "CRITIC", "Stress-test report"],
+            ].map(([n, name, description], index) => (
+              <div key={name} className="relative border-t border-white/[0.06] py-4 pl-5 last:border-b">
+                <span className="absolute -left-[4px] top-[22px] size-[7px] rounded-full border border-[#83f3dc]/30 bg-[#090a0c]" />
+                <div className="flex items-baseline justify-between"><span className="text-[11px] font-medium text-zinc-400">{name}</span><span className="mono-label text-[7px] text-zinc-800">{n}</span></div>
+                <p className="mt-1 text-[9px] text-zinc-700">{description}</p>
+                {index === 0 && <ArrowDownRight className="absolute right-0 top-4 size-3 text-[#83f3dc]/35" />}
+              </div>
+            ))}
+          </div>
+        </aside>
       </div>
     </main>
   );

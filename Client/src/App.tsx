@@ -4,7 +4,7 @@ import { EmptyState } from "@/components/empty-state";
 import { ResearchWorkspace } from "@/components/research-workspace";
 import { Sidebar } from "@/components/sidebar";
 import { checkHealth, streamResearch } from "@/lib/api";
-import type { ResearchResult, StageKey, StageState, StreamEvent } from "@/types/research";
+import type { ModelProvider, ResearchResult, StageKey, StageState, StreamEvent } from "@/types/research";
 
 const initialStages: StageState[] = [
   { key: "search", label: "Search the web", description: "Discover recent, relevant evidence", status: "idle" },
@@ -17,6 +17,8 @@ export default function App() {
   const [query, setQuery] = useState("");
   const [submittedQuery, setSubmittedQuery] = useState("");
   const [result, setResult] = useState<ResearchResult | null>(null);
+  const [liveSources, setLiveSources] = useState<string[]>([]);
+  const [activeModel, setActiveModel] = useState<ModelProvider>("Gemini");
   const [stages, setStages] = useState<StageState[]>(initialStages);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -49,8 +51,12 @@ export default function App() {
 
   function handleStreamEvent(event: StreamEvent) {
     if (event.type === "stage") updateStage(event.stage, event.status);
+    if (event.type === "sources") setLiveSources(event.sources);
+    if (event.type === "model") setActiveModel(event.provider);
     if (event.type === "complete") {
       setResult(event.result);
+      setLiveSources(event.result.sources);
+      setActiveModel(event.result.final_model);
       setLoading(false);
     }
     if (event.type === "error") {
@@ -66,6 +72,8 @@ export default function App() {
     controller.current = new AbortController();
     setSubmittedQuery(clean);
     setResult(null);
+    setLiveSources([]);
+    setActiveModel("Gemini");
     setError(null);
     setStages(initialStages.map((stage) => ({ ...stage })));
     setLoading(true);
@@ -88,6 +96,8 @@ export default function App() {
     setQuery("");
     setSubmittedQuery("");
     setResult(null);
+    setLiveSources([]);
+    setActiveModel("Gemini");
     setError(null);
     setLoading(false);
     setStages(initialStages.map((stage) => ({ ...stage })));
@@ -109,11 +119,11 @@ export default function App() {
       )}
       {!hasSession ? (
         <div className="relative flex min-w-0 flex-1 flex-col">
-          <button className="absolute left-4 top-4 z-20 grid size-10 place-items-center rounded-xl border border-white/10 bg-black/20 text-zinc-400 md:hidden" onClick={() => setSidebarOpen(true)}>☰</button>
+          <button className="absolute left-4 top-4 z-20 grid size-10 place-items-center border border-white/10 bg-[#0b0d10] text-zinc-500 md:hidden" onClick={() => setSidebarOpen(true)}>☰</button>
           <EmptyState query={query} setQuery={setQuery} onSubmit={runResearch} />
         </div>
       ) : (
-        <ResearchWorkspace query={query} setQuery={setQuery} submittedQuery={submittedQuery} result={result} stages={stages} loading={loading} error={error} onSubmit={runResearch} onOpenSidebar={() => setSidebarOpen(true)} />
+        <ResearchWorkspace query={query} setQuery={setQuery} submittedQuery={submittedQuery} result={result} liveSources={liveSources} activeModel={activeModel} stages={stages} loading={loading} error={error} onSubmit={runResearch} onOpenSidebar={() => setSidebarOpen(true)} />
       )}
     </div>
   );
