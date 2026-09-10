@@ -1,10 +1,12 @@
-from app.llm.gemini import get_llm
+from typing import Any
+
+from langchain_core.output_parsers import StrOutputParser
+from app.llm.gemini import get_gemini_llm
 from app.prompts.CriticPrompt import critic_prompt
 from app.prompts.WriterPrompt import writer_prompt
-from langchain_core.output_parsers import StrOutputParser
 
+def build_writer_chain(model: Any | None = None):
+    return writer_prompt | (model or get_gemini_llm()) | StrOutputParser()
 
-llm = get_llm()
-
-writer_chain = writer_prompt | llm | StrOutputParser()
-critic_chain = critic_prompt | llm | StrOutputParser()
+def build_critic_chain(model: Any | None = None):
+    return critic_prompt | (model or get_gemini_llm()) | StrOutputParser()
