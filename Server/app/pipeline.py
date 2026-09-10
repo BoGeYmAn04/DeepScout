@@ -7,19 +7,31 @@ from app.chains.chain import writer_chain, critic_chain
 
 ProgressCallback = Callable[[dict[str, Any]], None]
 
-
 def _emit(callback: ProgressCallback | None, stage: str, status: str, message: str) -> None:
     if callback:
-        callback({"type": "stage", "stage": stage, "status": status, "message": message})
+        callback({
+            "type": "stage",
+            "stage": stage,
+            "status": status,
+            "message": message,
+        })
 
+def run_research_pipeline(
+    query: str,
+    on_progress: ProgressCallback | None = None,
+) -> dict[str, Any]:
+    query = query.strip()
+    if not query:
+        raise ValueError("Research query cannot be empty.")
 
-def run_research_pipeline(query: str, on_progress: ProgressCallback | None = None) -> dict:
-    state = {}
+    state: dict[str, Any] = {"query": query}
 
     _emit(on_progress, "search", "running", "Searching for recent, reliable sources")
     search_agent = build_search_agent()
     search_results = search_agent.invoke({
-        "messages": [("user", f"Find recent, reliable, and relevant information about {query}.")]
+        "messages": [
+            ("user", f"Find recent, reliable, and relevant information about {query}.")
+        ]
     })
     state["search_results"] = search_results["messages"][-1].content
     _emit(on_progress, "search", "complete", "Relevant web evidence discovered")
@@ -27,11 +39,14 @@ def run_research_pipeline(query: str, on_progress: ProgressCallback | None = Non
     _emit(on_progress, "reader", "running", "Opening and reading the strongest source")
     reader_agent = build_reader_agent()
     reader_results = reader_agent.invoke({
-        "messages": [("user",
-            f"Based on the following search results about '{query}', "
-            f"pick the most relevant URL and scrape it in deeper content.\n\n"
-            f"Search Results:\n{state['search_results'][:800]}"
-        )]
+        "messages": [
+            (
+                "user",
+                f"Based on the following search results about '{query}', "
+                f"pick the most relevant URL and scrape it for deeper content.\n\n"
+                f"Search Results:\n{state['search_results'][:800]}",
+            )
+        ]
     })
     state["scraped_content"] = reader_results["messages"][-1].content
     _emit(on_progress, "reader", "complete", "Primary source inspected")
@@ -58,9 +73,13 @@ def run_research_pipeline(query: str, on_progress: ProgressCallback | None = Non
 
     return state
 
-
 if __name__ == "__main__":
-    query = "The impact of climate change on global agriculture"
-    results = run_research_pipeline(query)
-    print("Research Report:\n", results["research_report"])
-    print("\nCritic Feedback:\n", results["critic_feedback"])
+    user_query = input("Enter your research query: ").strip()
+    if not user_query:
+        raise ValueError("Please enter a research query.")
+
+    results = run_research_pipeline(user_query)
+    print("\n=== Research Report ===\n")
+    print(results["research_report"])
+    print("\n=== Critic Feedback ===\n")
+    print(results["critic_feedback"])
